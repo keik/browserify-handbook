@@ -103,22 +103,19 @@ npm install -g browserify-handbook
 
 # node packaged modules
 
-Before we can dive too deeply into how to use browserify and how it works, it is
-important to first understand how the
-[node-flavored version](http://nodejs.org/docs/latest/api/modules.html)
-of the commonjs module system works.
+browserifyの使い方や動作の仕組みの前に、まずは[Nodeが採用しているCommon JSモジュールシステム](http://nodejs.org/docs/latest/api/modules.html)について理解することが重要です。
 
 ## require
 
-In node, there is a `require()` function for loading code from other files.
+Nodeには他のファイルからコードを読み込むための `require()` 関数があります。
 
-If you install a module with [npm](https://npmjs.org):
+[npm](https://npmjs.org) を使って次のように `uniq` モジュールをインストールした場合、
 
 ```
 npm install uniq
 ```
 
-Then in a file `nums.js` we can `require('uniq')`:
+`nums.js` ファイルを作成してそこに `require('uniq')` と書くことで、 `uniq` モジュールを読み込むことができます。
 
 ```
 var uniq = require('uniq');
@@ -126,42 +123,35 @@ var nums = [ 5, 2, 1, 3, 2, 5, 4, 2, 0, 1 ];
 console.log(uniq(nums));
 ```
 
-The output of this program when run with node is:
+このプログラムをNodeで実行すると、次の出力が得られます。
 
 ```
 $ node nums.js
 [ 0, 1, 2, 3, 4, 5 ]
 ```
 
-You can require relative files by requiring a string that starts with a `.`. For
-example, to load a file `foo.js` from `main.js`, in `main.js` you can do:
+相対パス上のファイルを読み込むためには、`require` 関数のパラメータを `.` から始めるように書きます。
+`main.js` ファイルから `foo.js` ファイルを読み込む場合は、次のようにします。
 
 ``` js
 var foo = require('./foo.js');
 console.log(foo(4));
 ```
 
-If `foo.js` was in the parent directory, you could use `../foo.js` instead:
+`foo.js` が親ディレクトリにある場合には、 `../foo.js` と書きます。
 
 ``` js
 var foo = require('../foo.js');
 console.log(foo(4));
 ```
 
-or likewise for any other kind of relative path. Relative paths are always
-resolved with respect to the invoking file's location.
+その他の相対パスについても同様に書きます。相対パスは呼び出し元のファイルの場所から解決されます。
 
-Note that `require()` returned a function and we assigned that return value to a
-variable called `uniq`. We could have picked any other name and it would have
-worked the same. `require()` returns the exports of the module name that you
-specify.
+上の例において、`require()` 関数は関数を返し、その戻り値を `uniq` という変数に代入していることに注目してください。
+代入する変数名には他の名前をつけることもできます。`require()` 関数は、指定したモジュール内でエクスポートされた値を返すのです。
 
-How `require()` works is unlike many other module systems where imports are akin
-to statements that expose themselves as globals or file-local lexicals with
-names declared in the module itself outside of your control. Under the node
-style of code import with `require()`, someone reading your program can easily
-tell where each piece of functionality came from. This approach scales much
-better as the number of modules in an application grows.
+他の多くのモジュールシステムでは、あるモジュールをインポートすると、そのモジュール内で宣言された変数がグローバルスコープやファイルローカルスコープで使用可能になるというものですが、Nodeの `require()` 関数はそれとは異なっています。
+この仕組みによって書かれたプログラムであれば、ある機能がどこから読み込まれたものか簡単に知ることができるため、アプリケーションの規模が増え大量のモジュールが読み込まれるようになっても破綻しにくいのです。
 
 ## exports
 

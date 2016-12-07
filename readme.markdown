@@ -4,13 +4,13 @@
 
 [![cc-by-3.0](http://i.creativecommons.org/l/by/3.0/80x15.png)](http://creativecommons.org/licenses/by/3.0/)
 
-browserifyは[nodeのモジュールシステム]((http://nodejs.org/docs/latest/api/modules.html)で用いられているcommonjsモジュールをブラウザ向けにコンパイルするツールです。
+browserifyは[nodeのモジュールシステム](http://nodejs.org/docs/latest/api/modules.html)で用いられているCommon JSモジュールをブラウザ向けにコンパイルするツールです。
 
 サードパーティのライブラリを使うコードをbrowserifyでビルドする場合、バンドル処理とnpmを用いたモジュールのインストールには[node](http://nodejs.org)を使います。それ以外にnodeの機能を使う必要はありません。
 
 browserifyはnodeのモジュールシステムを使用します。したがって[npm](https://npmjs.org)に公開されたnode向けのモジュールをブラウザ上でも動作させることができます。
 
-npmに公開されているモジュールは、それがnodeとブラウザのどちらでも動作するように作られることが増えてきており、中にはブラウザでのみ動作するモジュールも多く公開されています。npmはバックエンドJavaScriptのためのものだけでなく、フロントエンドのためのものでもあるのです ([npm is for all javascript](http://maxogden.com/node-packaged-modules.html))。
+npmに公開されているモジュールは、それがnodeとブラウザのどちらでも動作するように作られることが増えてきており、中にはブラウザでのみ動作するモジュールも多く公開されています。[npmはバックエンドJavaScriptのためのものだけでなく、フロントエンドのためのものでもある](http://maxogden.com/node-packaged-modules.html)のです。
 
 
 # table of contents

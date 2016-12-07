@@ -1,27 +1,17 @@
 # introduction
 
-This document covers how to use [browserify](http://browserify.org) to build
-modular applications.
+このドキュメントでは、[browserify](http://browserify.org) を使ってモジュール化されたアプリケーションを作る方法を説明します。
 
 [![cc-by-3.0](http://i.creativecommons.org/l/by/3.0/80x15.png)](http://creativecommons.org/licenses/by/3.0/)
 
-browserify is a tool for compiling
-[node-flavored](http://nodejs.org/docs/latest/api/modules.html) commonjs modules
-for the browser.
+browserifyは[nodeのモジュールシステム]((http://nodejs.org/docs/latest/api/modules.html)で用いられているcommonjsモジュールをブラウザ向けにコンパイルするツールです。
 
-You can use browserify to organize your code and use third-party libraries even
-if you don't use [node](http://nodejs.org) itself in any other capacity except
-for bundling and installing packages with npm.
+サードパーティのライブラリを使うコードをbrowserifyでビルドする場合、バンドル処理とnpmを用いたモジュールのインストールには[node](http://nodejs.org)を使います。それ以外にnodeの機能を使う必要はありません。
 
-The module system that browserify uses is the same as node, so
-packages published to [npm](https://npmjs.org) that were originally intended for
-use in node but not browsers will work just fine in the browser too.
+browserifyはnodeのモジュールシステムを使用します。したがって[npm](https://npmjs.org)に公開されたnode向けのモジュールをブラウザ上でも動作させることができます。
 
-Increasingly, people are publishing modules to npm which are intentionally
-designed to work in both node and in the browser using browserify and many
-packages on npm are intended for use in just the browser.
-[npm is for all javascript](http://maxogden.com/node-packaged-modules.html),
-front or backend alike.
+npmに公開されているモジュールは、それがnodeとブラウザのどちらでも動作するように作られることが増えてきており、中にはブラウザでのみ動作するモジュールも多く公開されています。npmはバックエンドJavaScriptのためのものだけでなく、フロントエンドのためのものでもあるのです ([npm is for all javascript](http://maxogden.com/node-packaged-modules.html))。
+
 
 # table of contents
 
@@ -103,15 +93,13 @@ front or backend alike.
 
 # node packaged manuscript
 
-You can install this handbook with npm, appropriately enough. Just do:
+このハンドブックは次のようにしてnpmでインストールできます。
 
 ```
 npm install -g browserify-handbook
 ```
 
-Now you will have a `browserify-handbook` command that will open this readme
-file in your `$PAGER`. Otherwise, you may continue reading this document as you
-are presently doing.
+これで、`browserify-handbook` コマンドによってこのドキュメントを既定の `$PAGER` で開くことができます。インストールせずにこのまま読み続けてもOKです。
 
 # node packaged modules
 
@@ -243,7 +231,7 @@ exports = function (n) { return n * 1000 }
 ```
 
 because the export value lives on the `module` object, and so assigning a new
-value for `exports` instead of `module.exports` masks the original reference. 
+value for `exports` instead of `module.exports` masks the original reference.
 
 Instead if you are going to export a single item, always do:
 
@@ -484,7 +472,7 @@ mapped back to their original files.
 ### AMD
 
 Instead of using `<script>` tags, every file is wrapped with a `define()`
-function and callback. [This is AMD](http://requirejs.org/docs/whyamd.html). 
+function and callback. [This is AMD](http://requirejs.org/docs/whyamd.html).
 
 The first argument is an array of modules to load that maps to each argument
 supplied to the callback. Once all the modules are loaded, the callback fires.
@@ -710,7 +698,7 @@ files are re-executed instead of the whole bundle on each modification.
 
 ### [budo](https://github.com/mattdesl/budo)
 
-budo is a browserify development server with a stronger focus on incremental bundling and LiveReload integration (including CSS injection). 
+budo is a browserify development server with a stronger focus on incremental bundling and LiveReload integration (including CSS injection).
 
 Install it like so:
 
@@ -1241,7 +1229,7 @@ node_modules/*
 
 Please note that you can't *unignore* a subdirectory,
 if the parent is already ignored. So instead of ignoring `node_modules`,
-you have to ignore every directory *inside* `node_modules` with the 
+you have to ignore every directory *inside* `node_modules` with the
 `node_modules/*` trick, and then you can add your exceptions.
 
 Now anywhere in your application you will be able to `require('foo')` or
@@ -1350,7 +1338,7 @@ insertStyle(css);
 
 Inserting css this way works fine for small reusable modules that you distribute
 with npm because they are fully-contained, but if you want a more wholistic
-approach to asset management using browserify, check out 
+approach to asset management using browserify, check out
 [atomify](https://www.npmjs.org/package/atomify) and
 [parcelify](https://www.npmjs.org/package/parcelify).
 
@@ -1591,7 +1579,7 @@ module.exports = function (x, cb) {
 };
 ```
 
-Here's how we can test this module using [tape](https://npmjs.org/package/tape). 
+Here's how we can test this module using [tape](https://npmjs.org/package/tape).
 Let's put this file in `test/beep.js`:
 
 ``` js
@@ -1600,7 +1588,7 @@ var hundreder = require('../');
 
 test('beep', function (t) {
     t.plan(1);
-    
+
     hundreder(5, function (n) {
         t.equal(n, 500, '5*100 === 500');
     });
@@ -2272,7 +2260,7 @@ Since version 5, browserify exposes its compiler pipeline as a
 This means that transformations can be added or removed directly into the
 internal pipeline. This pipeline provides a clean interface for advanced
 customizations such as watching files or factoring bundles from multiple entry
-points. 
+points.
 
 For example, we could replace the built-in integer-based labeling mechanism with
 hashed IDs by first injecting a pass-through transform after the "deps" have
@@ -2296,11 +2284,11 @@ b.pipeline.get('deps').push(hasher);
 
 var labeler = through.obj(function (row, enc, next) {
     row.id = hashes[row.id];
-    
+
     Object.keys(row.deps).forEach(function (key) {
         row.deps[key] = hashes[row.deps[key]];
     });
-    
+
     this.push(row);
     next();
 });
@@ -2395,7 +2383,7 @@ the rows written to it in order to make the bundles deterministic.
 
 The transform at this phase uses dedupe information provided by
 [deps-sort](https://www.npmjs.org/package/deps-sort) in the `sort` phase to
-remove files that have duplicate contents. 
+remove files that have duplicate contents.
 
 ### label
 

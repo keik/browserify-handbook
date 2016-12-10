@@ -1,24 +1,24 @@
-# introduction
+# はじめに
 
-このドキュメントでは、[browserify](http://browserify.org) を使ってモジュール化されたアプリケーションを作る方法を説明します。
+このドキュメントは [Browserify](http://browserify.org) を使ってモジュール化されたアプリケーションを作る方法を説明するためのものです。
 
 [![cc-by-3.0](http://i.creativecommons.org/l/by/3.0/80x15.png)](http://creativecommons.org/licenses/by/3.0/)
 
-browserifyは[nodeのモジュールシステム](http://nodejs.org/docs/latest/api/modules.html)で用いられているCommon JSモジュールをブラウザ向けにコンパイルするツールです。
+Browserifyは[Nodeのモジュールシステム](http://nodejs.org/docs/latest/api/modules.html)であるCommon JSモジュールをブラウザ向けにコンパイルするツールです。
 
-サードパーティのライブラリを使うコードをbrowserifyでビルドする場合、バンドル処理とnpmを用いたモジュールのインストールには[node](http://nodejs.org)を使います。それ以外にnodeの機能を使う必要はありません。
+Browserifyによるビルド処理と、サードパーティライブラリのインストール処理には[Node](http://nodejs.org)を使います。それ以外にNodeの機能を使う必要はありません。
 
-browserifyはnodeのモジュールシステムを使用します。したがって[npm](https://npmjs.org)に公開されたnode向けのモジュールをブラウザ上でも動作させることができます。
+BrowserifyはNodeのモジュールシステムを使用するため、Node上で動作させることを意図して[npm](https://npmjs.org)に公開されているモジュールをブラウザ上でも動作させることができます。
 
-npmに公開されているモジュールは、それがnodeとブラウザのどちらでも動作するように作られることが増えてきており、中にはブラウザでのみ動作するモジュールも多く公開されています。[npmはバックエンドJavaScriptのためのものだけでなく、フロントエンドのためのものでもある](http://maxogden.com/node-packaged-modules.html)のです。
+今やnpmにはNodeとブラウザのどちらでも動作することを意図したモジュールが多く公開されるようになっており、中にはブラウザでのみ動作することを意図したモジュールもあります。[npmはバックエンドJavaScriptのためのものだけでなく、フロントエンドのためのものでもある](http://maxogden.com/node-packaged-modules.html)のです。
 
 
-# table of contents
+# 目次
 
-- [introduction](#introduction)
-- [table of contents](#table-of-contents)
-- [node packaged manuscript](#node-packaged-manuscript)
-- [node packaged modules](#node-packaged-modules)
+- [はじめに](#はじめに)
+- [目次](#目次)
+- [ドキュメントのインストール](#ドキュメントのインストール)
+- [Nodeのモジュールシステム](#Nodeのモジュールシステム)
   - [require](#require)
   - [exports](#exports)
   - [bundling for the browser](#bundling-for-the-browser)
@@ -91,17 +91,17 @@ npmに公開されているモジュールは、それがnodeとブラウザの�
   - [using plugins](#using-plugins)
   - [authoring plugins](#authoring-plugins)
 
-# node packaged manuscript
+# ドキュメントのインストール
 
-このハンドブックは次のようにしてnpmでインストールできます。
+このドキュメントはnpmでインストールできます。
 
 ```
 npm install -g browserify-handbook
 ```
 
-これで、`browserify-handbook` コマンドによってこのドキュメントを既定の `$PAGER` で開くことができます。インストールせずにこのまま読み続けてもOKです。
+インストール後は、 `browserify-handbook` コマンドでこのドキュメントを既定の `$PAGER` で開けます。インストールせずにこのまま読み続けてもOKです。
 
-# node packaged modules
+# Node モジュール
 
 browserifyの使い方や動作の仕組みの前に、まずは[Nodeが採用しているCommon JSモジュールシステム](http://nodejs.org/docs/latest/api/modules.html)について理解することが重要です。
 
@@ -155,8 +155,7 @@ console.log(foo(4));
 
 ## exports
 
-To export a single thing from a file so that other files may import it, assign
-over the value at `module.exports`:
+ファイル内のコードを他のファイルからインポート可能にするためには、エクスポートする値を `module.exports` に代入します。
 
 ``` js
 module.exports = function (n) {
@@ -164,29 +163,25 @@ module.exports = function (n) {
 };
 ```
 
-Now when some module `main.js` loads your `foo.js`, the return value of
-`require('./foo.js')` will be the exported function:
+上で作成した `foo.js` を他のモジュール `main.js` から読み込む場合、 `require('./foo.js')` と書くことでエクスポートされた関数が得られます。
 
 ``` js
 var foo = require('./foo.js');
 console.log(foo(5));
 ```
 
-This program will print:
+このプログラムの出力結果は次のようになります。
 
 ```
 555
 ```
 
-You can export any kind of value with `module.exports`, not just functions.
+また次の例のように、関数以外のどんな値でも `module.exports` に代入してエクスポートできます。
 
-For example, this is perfectly fine:
 
 ``` js
 module.exports = 555
 ```
-
-and so is this:
 
 ``` js
 var numbers = [];
@@ -195,43 +190,39 @@ for (var i = 0; i < 100; i++) numbers.push(i);
 module.exports = numbers;
 ```
 
-There is another form of doing exports specifically for exporting items onto an
-object. Here, `exports` is used instead of `module.exports`:
+オブジェクトにエクスポートする別の方法として、次の例のように `module.exports` の代わりに `exports` のプロパティに代入することもできます。
 
 ``` js
 exports.beep = function (n) { return n * 1000 }
 exports.boop = 555
 ```
 
-This program is the same as:
+次のようにしても同様です。
 
 ``` js
 module.exports.beep = function (n) { return n * 1000 }
 module.exports.boop = 555
 ```
 
-because `module.exports` is the same as `exports` and is initially set to an
-empty object.
+なぜなら `module.exports` と `exports` は、デフォルトで同じ空のオブジェクトを参照しているからです。
 
-Note however that you can't do:
+注意点として、次のようにはできません。
 
 ``` js
 // this doesn't work
 exports = function (n) { return n * 1000 }
 ```
 
-because the export value lives on the `module` object, and so assigning a new
-value for `exports` instead of `module.exports` masks the original reference.
+最終的にエクスポートされる値は `module` オブジェクト上にある必要があるため、 `exports` 自体に新しい値を代入すると `module.exports` への参照が失われてしまうためです。
 
-Instead if you are going to export a single item, always do:
+よって一つの値をエクスポートしたい場合には、次のようにするといいです。
 
 ``` js
 // instead
 module.exports = function (n) { return n * 1000 }
 ```
 
-If you're still confused, try to understand how modules work in
-the background:
+まだピンとこないようなら、次のような仕組みで動作していると理解するよう努めてください。
 
 ``` js
 var module = {
@@ -246,14 +237,13 @@ var module = {
 console.log(module.exports); // it's still an empty object :(
 ```
 
+大抵の場合、モジュールは一つのことを行うように設計されているほうが便利なので、`module.exports` を使って一つの関数またはコンストラクタをエクスポートするといいです。
 Most of the time, you will want to export a single function or constructor with
 `module.exports` because it's usually best for a module to do one thing.
 
-The `exports` feature was originally the primary way of exporting functionality
-and `module.exports` was an afterthought, but `module.exports` proved to be much
-more useful in practice at being more direct, clear, and avoiding duplication.
+はじめのころのエクスポートの主な手段は `exports` でしたが、後に `module.exports` が使えるようになってからは、こちらのほうがより便利で直感的で無駄がないことが示されています。
 
-In the early days, this style used to be much more common:
+昔は次のような書き方が一般的でした。
 
 foo.js:
 
@@ -268,8 +258,7 @@ var foo = require('./foo.js');
 console.log(foo.foo(5));
 ```
 
-but note that the `foo.foo` is a bit superfluous. Using `module.exports` it
-becomes more clear:
+しかし `foo.foo` というコードは少し冗長です。 `module.exports` を使えばもっときれいになります。
 
 foo.js:
 
@@ -2244,18 +2233,15 @@ a.addEventListener('click', function() {
 
 # compiler pipeline
 
-Since version 5, browserify exposes its compiler pipeline as a
-[labeled-stream-splicer](https://www.npmjs.org/package/labeled-stream-splicer).
+Browserifyバージョン5以降では、コード変換処理を行うパイプラインにアクセス可能となりました。
+パイプラインとは、変換の目的ごとに分割された複数のストリームが連結されたもので、[labeled-stream-splicer](https://www.npmjs.org/package/labeled-stream-splicer)で実装されています。
 
-This means that transformations can be added or removed directly into the
-internal pipeline. This pipeline provides a clean interface for advanced
-customizations such as watching files or factoring bundles from multiple entry
-points.
+パイプラインのAPIを用いれば、コード変換処理の内部的なストリームに対して、直に transform の追加や削除ができます。
+これを活用することで、ファイル変更監視や複数エントリポイントに応じた分割ビルドといった、高度なカスタマイズができるのです。
 
-For example, we could replace the built-in integer-based labeling mechanism with
-hashed IDs by first injecting a pass-through transform after the "deps" have
-been calculated to hash source files. Then we can use the hashes we captured to
-create our own custom labeler, replacing the built-in "label" transform:
+たとえば、依存ファイルのIDに整数を用いるという標準動作のかわりに、ファイルのハッシュ値を用いるというカスタマイズを考えましょう。
+まずは `deps` という名前のパイプラインに対し、ストリームに流れてきたファイルのハッシュ値を計算し変数にキャッシュする transfrom を追加します。
+次に `label` という名前のパイプラインに対しては、デフォルトの transform を削除する代わりに、ストリームに流れてきた依存ファイルのIDをハッシュ値で上書きするという transfrom を追加します。
 
 ``` js
 var browserify = require('browserify');
@@ -2287,8 +2273,7 @@ b.pipeline.get('label').splice(0, 1, labeler);
 b.bundle().pipe(process.stdout);
 ```
 
-Now instead of getting integers for the IDs in the output format, we get file
-hashes:
+これで、ファイルのIDにファイルのハッシュ値が使われた出力が得られました。
 
 ```
 $ node bundle.js
@@ -2307,10 +2292,9 @@ module.exports = function (n) { return n + 1 };
 },{}]},{},["5f0a0e3a143f2356582f58a70f385f4bde44f04b"]);
 ```
 
-Note that the built-in labeler does other things like checking for the external,
-excluded configurations so replacing it will be difficult if you depend on those
-features. This example just serves as an example for the kinds of things you can
-do by hacking into the compiler pipeline.
+注意点として、 `label` パイプラインのデフォルト実装では除外すべきファイルのチェックなどをしているため、
+上のサンプルのようにデフォルト実装を置き換えてしまうと他の機能を壊す可能性があります。
+パイプラインの編集方法を説明するための簡略化したサンプルであることに気をつけてください。
 
 ## build your own browserify
 

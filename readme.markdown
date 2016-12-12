@@ -21,8 +21,8 @@ BrowserifyはNodeのモジュールシステムを使用するため、Node上�
 - [Nodeのモジュールシステム](#Nodeのモジュールシステム)
   - [require](#require)
   - [exports](#exports)
-  - [bundling for the browser](#bundling-for-the-browser)
-  - [how browserify works](#how-browserify-works)
+  - [ブラウザ用にバンドルする](#ブラウザ用にバンドルする)
+  - [Browserifyの動作原理](#Browserifyの動作原理)
   - [how node_modules works](#how-node_modules-works)
   - [why concatenate](#why-concatenate)
 - [development](#development)
@@ -273,27 +273,25 @@ var foo = require('./foo.js');
 console.log(foo(5));
 ```
 
-## bundling for the browser
+## ブラウザ用にバンドルする
 
 To run a module in node, you've got to start from somewhere.
 
-In node you pass a file to the `node` command to run a file:
+Nodeでは、 `node` コマンドにファイルを渡して実行します。
 
 ```
 $ node robot.js
 beep boop
 ```
 
-In browserify, you do this same thing, but instead of running the file, you
-generate a stream of concatenated javascript files on stdout that you can write
-to a file with the `>` operator:
+Browserifyでも同じようにコマンドにファイルを渡しますが、その結果はファイルを実行するのではなく、ビルドされたJavaScriptのストリームが標準出力に流れます。 `>` 演算子を使えばファイルに出力できます。
 
 ```
 $ browserify robot.js > bundle.js
 ```
 
-Now `bundle.js` contains all the javascript that `robot.js` needs to work.
-Just plop it into a single script tag in some html:
+上のコマンドの結果、 `robot.js` の動作に必要なすべてのコードが `bundle.js` に書き込まれます。
+そうしたらこのファイルをHTML内から `script` タグを使って読み込むだけです。
 
 ``` html
 <html>
@@ -303,38 +301,27 @@ Just plop it into a single script tag in some html:
 </html>
 ```
 
-Bonus: if you put your script tag right before the `</body>`, you can use all of
-the dom elements on the page without waiting for a dom onready event.
+TIPS: `script` タグを `</ body>` の直前に書くことで、DOMの `onready` イベントを待たなくてもページ上のすべてのDOM要素を使うことができます。
 
-There are many more things you can do with bundling. Check out the bundling
-section elsewhere in this document.
+バンドル処理ではもっとたくさんのことができます。詳細は[バンドル](#バンドル)セクションを参照してください。
 
-## how browserify works
+## Browserifyの動作原理
 
-Browserify starts at the entry point files that you give it and searches for any
-`require()` calls it finds using
-[static analysis](http://npmjs.org/package/detective)
-of the source code's
-[abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree).
+Browserifyは、エントリポイントのファイルを[抽象構文木](https://en.wikipedia.org/wiki/Abstract_syntax_tree)を用いて静的解析することで `require()` の呼び出し箇所を[探し出します](http://npmjs.org/package/detective)。
 
-For every `require()` call with a string in it, browserify resolves those module
-strings to file paths and then searches those file paths for `require()` calls
-recursively until the entire dependency graph is visited.
+`require()` が文字列の引数とともに呼び出されている箇所ごとに、そのモジュールのファイルパスを解決し、さらにそのファイル内での `require()` 呼び出しを依存グラフ全体に対して再帰的に検索します。
 
-Each file is concatenated into a single javascript file with a minimal
-`require()` definition that maps the statically-resolved names to internal IDs.
+そうして解決された各ファイルは一つのJavaScriptファイルとして結合されます。結合後のファイルには独自の小さな `require()` 関数の実装が含まれており、れは各ファイルに内部的に割り当てられたIDに基いて依存性を解決するように動作します。
 
-This means that the bundle you generate is completely self-contained and has
-everything your application needs to work with a pretty negligible overhead.
+つまり、生成されるバンドルには、動作に必要なコードが全て含まれ、動作のオーバーヘッドもごくわずかなものとなるのです。
 
-For more details about how browserify works, check out the compiler pipeline
-section of this document.
+より詳細な動作については[コンパイラパイプライン](#コンパイラパイプライン)セクションを参照してください。
 
 ## how node_modules works
 
-node has a clever algorithm for resolving modules that is unique among rival
-platforms.
+Nodeには、他のプラットフォームにはない賢いモジュールの解決アルゴリズムを持っています。
 
+Nodeでは、コマンドラインのように `$PATH` などのシステムのパス上からパッケージを検索するといった動作ではなく、ローカルから探し出します。
 Instead of resolving packages from an array of system search paths like how
 `$PATH` works on the command line, node's mechanism is local by default.
 

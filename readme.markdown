@@ -321,17 +321,12 @@ Browserifyは、エントリポイントのファイルを[抽象構文木](http
 
 Nodeには、他のプラットフォームにはない賢いモジュールの解決アルゴリズムを持っています。
 
-Nodeでは、コマンドラインのように `$PATH` などのシステムのパス上からパッケージを検索するといった動作ではなく、ローカルから探し出します。
-Instead of resolving packages from an array of system search paths like how
-`$PATH` works on the command line, node's mechanism is local by default.
+Nodeでは、コマンドラインツールのように `$PATH` などのシステムのパス上からパッケージを検索するのではなく、ローカルから探し出します。
 
-If you `require('./foo.js')` from `/beep/boop/bar.js`, node will
-look for `./foo.js` in `/beep/boop/foo.js`. Paths that start with a `./` or
-`../` are always local to the file that calls `require()`.
+`/beep/boop/bar.js` ファイル内で `require('./foo.js')` というコードが呼び出されると、Node は `./foo.js` の場所を `/beep/boop/foo.js` と解決して探し出します。
+`./` または `../` から始まるパスは、`require()` を呼び出したファイルからの相対パスになります。
 
-If however you require a non-relative name such as `require('xyz')` from
-`/beep/boop/foo.js`, node searches these paths in order, stopping at the first
-match and raising an error if nothing is found:
+`require('xyz')` のように相対パスではないパスで呼び出された場合は、モジュールが見つかるまで次の順で探し出し、見つからなかった場合はエラーを発生させます。
 
 ```
 /beep/boop/node_modules/xyz
@@ -339,12 +334,9 @@ match and raising an error if nothing is found:
 /node_modules/xyz
 ```
 
-For each `xyz` directory that exists, node will first look for a
-`xyz/package.json` to see if a `"main"` field exists. The `"main"` field defines
-which file should take charge if you `require()` the directory path.
+`xyz` ディレクトリが存在する場合は、 `xyz/package.json` ファイル内の `"main"` フィールドを見に行きます。 `"main"` フィールドが定義されている場合は、そこで指定されたファイルが `require()` の結果として返されます。
 
-For example, if `/beep/node_modules/xyz` is the first match and
-`/beep/node_modules/xyz/package.json` has:
+例えば最初に `/beep/node_modules/xyz` が見つかり、さらに `/beep/node_modules/xyz/package.json` ファイルが次のように定義されていた場合、
 
 ```
 {
@@ -354,34 +346,25 @@ For example, if `/beep/node_modules/xyz` is the first match and
 }
 ```
 
-then the exports from `/beep/node_modules/xyz/lib/abc.js` will be returned by
-`require('xyz')`.
+`require('xyz')` の結果として `/beep/node_modules/xyz/lib/abc.js` のエクスポートした値が得られます。
 
-If there is no `package.json` or no `"main"` field, `index.js` is assumed:
+もし `package.json` や `"main"` フィールドの定義が存在しない場合は、 `index.js` ファイルを探し出します。
 
 ```
 /beep/node_modules/xyz/index.js
 ```
 
-If you need to, you can reach into a package to pick out a particular file. For
-example, to load the `lib/clone.js` file from the `dat` package, just do:
+パッケージ内の特定のファイルを指定して読み込むこともできます。 `dat` パッケージ内にある `lib/clone.js` ファイルを読み込む場合は次のようにします。
 
 ```
 var clone = require('dat/lib/clone.js')
 ```
 
-The recursive node_modules resolution will find the first `dat` package up the
-directory hierarchy, then the `lib/clone.js` file will be resolved from there.
-This `require('dat/lib/clone.js')` approach will work from any location where
-you can `require('dat')`.
+この場合、 `node_modules` 内を探して最初に見つかった `dat` パッケージのディレクトリを起点とし、 `lib/clone.js` を解決します。
 
-node also has a mechanism for searching an array of paths, but this mechanism is
-deprecated and you should be using `node_modules/` unless you have a very good
-reason not to.
+Nodeにはパス上から探し出す機能もありますが非推奨です。よほどの理由がない限りは `node_modules` 内から解決する方法を使うべきです。
 
-The great thing about node's algorithm and how npm installs packages is that you
-can never have a version conflict, unlike most every other platform. npm
-installs the dependencies of each package into `node_modules`.
+Nodeのモジュール解決アルゴリズムとnpmによるパッケージインストールの仕組みは、他のプラットフォームで起こりがちなバージョンの競合を起こすことがありません。npmはパッケージの依存モジュールを `node_modules` 内にインストールします。
 
 Each library gets its own local `node_modules/` directory where its dependencies
 are stored and each dependency's dependencies has its own `node_modules/`

@@ -399,49 +399,33 @@ You can leverage how `node_modules/` works to organize your own local
 application modules too. See the `avoiding ../../../../../../..` section for
 more.
 
-## why concatenate
+## ファイルを結合する目的
 
-Browserify is a build step that runs on the server. It generates a single bundle
-file that has everything in it.
+Browserifyによるビルドはサーバ側で行われます。その結果、動作に必要なすべてのソースコードを含むひとかたまりのファイルを生成します。
 
-Here are some other ways of implementing module systems for the browser and what
-their strengths and weaknesses are:
+他にもブラウザ向けにモジュールシステムを実装する方法はありますが、それぞれに長所・短所があります。
 
-### window globals
+### グローバルなwindow
 
-Instead of a module system, each file defines properties on the window global
-object or develops an internal namespacing scheme.
+モジュールシステムを使わない代わりに、各ファイルがグローバルの `window` オブジェクトにプロパティや独自の名前空間を定義するという方法があります。
 
-This approach does not scale well without extreme diligence since each new file
-needs an additional `<script>` tag in all of the html pages where the
-application will be rendered. Further, the files tend to be very order-sensitive
-because some files need to be included before other files the expect globals to
-already be present in the environment.
+この方法では、読み込むスクリプトを増やすたびすべてのHTMLに対して `<script>` タグを追記していく必要があるので、アプリケーションをスケールしていくのが面倒です。さらにグローバルに特定のプロパティが定義済みであることを前提としたスクリプトがあると、ファイルの読み込み順序も考慮しなくてはならなくなります。
 
-It can be difficult to refactor or maintain applications built this way.
-On the plus side, all browsers natively support this approach and no server-side
-tooling is required.
+この方法はリファクタリングもメンテナンスも難しくなりがちです。メリットを挙げるとすれば、すべてのブラウザで動作することと、サーバで何のツールも使わずに済むことです。
 
-This approach tends to be very slow since each `<script>` tag initiates a
-new round-trip http request.
+その他、各 `<script>` タグごとにHTTPリクエストを行うのでロードが非常に遅くなりがちです。
 
-### concatenate
+## ファイル結合
 
-Instead of window globals, all the scripts are concatenated beforehand on the
-server. The code is still order-sensitive and difficult to maintain, but loads
-much faster because only a single http request for a single `<script>` tag needs
-to execute.
+グローバルな `window` を使わない代わりに、すべてのスクリプトファイルを結合する方法です。この方法でもやはりファイルを結合する順番を考慮する必要があるため、メンテナンス性はよくありません。ただし `<script>` タグが一つで済むのでロードは早くなります。
 
-Without source maps, exceptions thrown will have offsets that can't be easily
-mapped back to their original files.
+またsource mapを活用しないと、例外の発生箇所を結合前のファイル内に対応付けるのが面倒です。
 
 ### AMD
 
-Instead of using `<script>` tags, every file is wrapped with a `define()`
-function and callback. [This is AMD](http://requirejs.org/docs/whyamd.html).
+`<script>` タグを使うかわりに、すべてのファイルを `define()` 関数とコールバックでラップする方法で、[AMD](http://requirejs.org/docs/whyamd.html) と呼ばれています。
 
-The first argument is an array of modules to load that maps to each argument
-supplied to the callback. Once all the modules are loaded, the callback fires.
+第一引数にはモジュール名の配列を渡します。これらのモジュールがロードされたのち、コールバック関数がそれらのモジュールを引数に受け取った形で呼び出されます。
 
 ``` js
 define(['jquery'] , function ($) {
@@ -449,19 +433,13 @@ define(['jquery'] , function ($) {
 });
 ```
 
-You can give your module a name in the first argument so that other modules can
-include it.
+第一引数には、他のモジュールからこのモジュールを呼び出すための名前を定義することもできます。
 
-There is a commonjs sugar syntax that stringifies each callback and scans it for
-`require()` calls
-[with a regexp](https://github.com/jrburke/requirejs/blob/master/require.js#L17).
+コールバック関数内ではCommonJS形式の `require()` 関数が使えるようになっています。これは[正規表現によるソースコードの変換](https://github.com/jrburke/requirejs/blob/master/require.js#L17)がなされているためです。
 
-Code written this way is much less order-sensitive than concatenation or globals
-since the order is resolved by explicit dependency information.
+この方法ではモジュール間の依存性が明示的に記述できるので、グローバル名前空間やファイル結合を用いた方法のようにファイル読み込み順序を気にしなくても済みます。
 
-For performance reasons, most of the time AMD is bundled server-side into a
-single file and during development it is more common to actually use the
-asynchronous feature of AMD.
+パフォーマンスを向上するため、通常はAMD形式のコードはサーバ上で一つのファイルにビルドされて配布されます。一方、開発中はビルドせずにAMDの非同期ロード機能を使うことが多いです。
 
 ### bundling commonjs server-side
 
@@ -510,26 +488,13 @@ into a separate `bundle.map.js` file:
 browserify main.js --debug | exorcist bundle.js.map > bundle.js
 ```
 
-## auto-recompile
+## 自動再ビルド
 
-Running a command to recompile your bundle every time can be slow and tedious.
-Luckily there are many tools to solve this problem. Some of these tools support
-live-reloading to various degrees and others have a more traditional manual
-refresh cycle.
+再ビルドするたびにコマンドを再実行するのは非効率的なので、ツールで自動化しましょう。幸いにも自動化に使えるツールはたくさんあります。中にはビルド以外にも再読み込みなどを自動化する機能を持つものもあります。
 
-These are just a few of the tools you can use, but there are many more on npm!
-There are many different tools here that encompass many different tradeoffs and
-development styles. It can be a little bit more work up-front to find the tools
-that responate most strongly with your own personal expectations and experience,
-but I think this diversity helps programmers to be more effective and provides
-more room for creativity and experimentation. I think diversity in tooling and a
-smaller browserify core is healthier in the medium to long term than picking a
-few "winners" by including them in browserify core (which creates all kinds of
-havoc in meaningful versioning and bitrot in core).
+実際に使うこととなるツールの数は少ないかもしれませんが、npmには実にたくさんのツールがあります！ そうしたツールの機能性の違いは、開発スタイルにも影響を与えるものです。たくさんのツールの中からあなたの期待や感覚にマッチするものを見つけ出すのは大変かもしれませんが、それらのツールの多様性に触れることこそが、プログラマとしてのスキルとセンスを磨くのに役立つはずです。Browserify自体が他の有力なライブラリを取り入れれば、もっとシンプルな使い方を提供することもできるでしょう。しかしそれよりも、Browserifyのコア機能を小さく保つことでツールの使い方に多様性を持たせることのほうが、長い目で見たときに健全と言えると思います。
 
-That said, here are a few modules you might want to consider for setting up a
-browserify development workflow. But keep an eye out for other tools not (yet)
-on this list!
+できるだけ少ないツールでビルドプロセスを構築したいと思うかもしれませんが、ここで紹介していないツールについてもぜひ調べてみてください！
 
 ### [watchify](https://npmjs.org/package/watchify)
 

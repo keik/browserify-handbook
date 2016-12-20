@@ -491,59 +491,49 @@ $ watchify browser.js -d -o static/bundle.js -v
 
 ### [beefy](https://www.npmjs.org/package/beefy)
 
+Webサーバ上で自動再ビルドをしたい場合、[beefy](http://didact.us/beefy/)が使えます。
 
-If you would rather spin up a web server that automatically recompiles your code
-when you modify it, check out [beefy](http://didact.us/beefy/).
-
-Just give beefy an entry file:
+使い方はbeefyコマンドにエントリファイルを渡すだけです。
 
 ```
 beefy main.js
 ```
 
-and it will set up shop on an http port.
+これでビルドしたファイルを配信するHTTPサーバが起動します。
 
 ### [wzrd](https://github.com/maxogden/wzrd)
 
-In a similar spirit to beefy but in a more minimal form is
-[wzrd](https://github.com/maxogden/wzrd).
+beefyに似てますがよりシンプルにしたものが[wzrd](https://github.com/maxogden/wzrd)です。
 
-Just `npm install -g wzrd` then you can do:
+`npm install -g wzrd` でインストールしたら次のように実行します。
 
 ```
 wzrd app.js
 ```
 
-and open up http://localhost:9966 in your browser.
+そしたらウェブブラウザで http://localhost:9966 にアクセスしてください。
 
 ### browserify-middleware, enchilada
 
-If you are using express, check out
-[browserify-middleware](https://www.npmjs.org/package/browserify-middleware)
-or [enchilada](https://www.npmjs.org/package/enchilada).
+Expressを使っているなら[browserify-middleware](https://www.npmjs.org/package/browserify-middleware)や[enchilada](https://www.npmjs.org/package/enchilada)が使えます。
 
-They both provide middleware you can drop into an express application for
-serving browserify bundles.
+どちらもBrowserifyのバンドルを配信するためのミドルウェアです。
 
-### [livereactload](https://github.com/milankinen/livereactload)
+### [LiveReactLoad](https://github.com/milankinen/livereactload)
 
-livereactload is a tool for [react](https://github.com/facebook/react)
-that automatically updates your web page state when you modify your code.
+LiveReactLoadは[React](https://github.com/facebook/react)コンポーネントの変更を表示中のウェブページに自動反映するツールです。
 
-livereactload is just an ordinary browserify transform that you can load with
-`-t livereactload`, but you should consult the
-[project readme](https://github.com/milankinen/livereactload#livereactload)
-for more information.
+使い方は[LiveReactLoadのREADME](https://github.com/milankinen/livereactload#livereactload)を参照してください。
 
 ### [browserify-hmr](https://github.com/AgentME/browserify-hmr)
 
-browserify-hmr is a plugin for doing hot module replacement (hmr).
+browserify-hmrは Hot Module Replacement (HMR) を可能にするプラグインです。
 
-Files can mark themselves as accepting updates. If you modify a file that
-accepts updates of itself, or if you modify a dependency of a file that accepts
-updates, then the file is re-executed with the new code.
+HMRによる更新に対応しているファイルや、それの依存ファイルを更新すると、更新後のファイルが再実行されます。
 
-For example, if we have a file, `main.js`:
+例として、次のようなファイルがあるとします。
+
+`main.js`:
 
 ``` js
 document.body.textContent = require('./msg.js')
@@ -551,33 +541,33 @@ document.body.textContent = require('./msg.js')
 if (module.hot) module.hot.accept()
 ```
 
-and a file `msg.js`:
+`msg.js`:
 
 ``` js
 module.exports = 'hey'
 ```
 
-We can watch `main.js` for changes and load the `browserify-hmr` plugin:
+次に `browserify-hmr` を使って `main.js` の変更を監視します。
 
 ```
 $ watchify main.js -p browserify-hmr -o public/bundle.js -dv
 ```
 
-and serve up the static file contents in `public/` with a static file server:
+さらに `public/` 内のファイルをホストするウェブサーバを起動します。
 
 ```
 $ ecstatic public -p 8000
 ```
 
-Now if we load `http://localhost:8000`, we see the message `hey` on the page.
+この状態で http://localhost:8000 にアクセスすると `hey` というメッセージが表示されるでしょう。
 
-If we change `msg.js` to be:
+続けて `msg.js` を次のように変更します。
 
 ``` js
 module.exports = 'wow'
 ```
 
-then a second later, the page updates to show `wow` all by itself.
+変更してすぐに、画面には自動的に `wow` というメッセージが表示されるでしょう。
 
 Browserify-HMR can be used with
 [react-hot-transform](https://github.com/AgentME/react-hot-transform) to

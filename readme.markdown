@@ -408,13 +408,10 @@ define(['jquery'] , function ($) {
 
 ### bundling commonjs server-side
 
-If you're going to have a build step for performance and a sugar syntax for
-convenience, why not scrap the whole AMD business altogether and bundle
-commonjs? With tooling you can resolve modules to address order-sensitivity and
-your development and production environments will be much more similar and less
-fragile. The CJS syntax is nicer and the ecosystem is exploding because of node
-and npm.
+効率よくビルドするためにAMDをやめてCommon JSを使ってみませんか？ ツールを使えばスクリプトの依存性を正しく解決できるし、開発時の環境をほぼそのままにプロダクション環境に反映できます。Commmon JSのシンタックスは優れている上に、Nodeとnpmを使用できるのでエコシステムの活用や発展にも役立ちます。
 
+ソースコードをビルドするステップし、それに関連してSource Mapsや自動再ビルドの
+Node環境とブラウザ環境でコードを共有できます。
 You can seamlessly share code between node and the browser. You just need a
 build step and some tooling for source maps and auto-rebuilding.
 
